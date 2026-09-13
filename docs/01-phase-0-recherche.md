@@ -193,7 +193,7 @@ Même niche, non détaillés ici : OneHeberge, Athena-Heberg, OuiHeberg, sur du 
 | Hébergeur | Offre | vCPU | CPU | RAM | Disque | Localisation | Prix mensuel |
 |---|---|---|---|---|---|---|---|
 | **PulseHeberg** | **PERF-8** (Performance Cloud) | 4 | **Ryzen 9 9900X, 4,4 GHz** (boost 5,66) | 8 Go DDR5 ECC | 100 Go NVMe | **Paris** | **18 € TTC** |
-| **netcup** | **RS 1000 G12** | **4 dédiés** | EPYC 9645 « Turin », 3,7 GHz crête | 8 Go DDR5 ECC | 256 Go NVMe | Nuremberg / Vienne / **Amsterdam** | 10,74 € HT ≈ **12,89 € TTC** |
+| **netcup** | **RS 1000 G12** | **4 dédiés** | EPYC 9645 « Turin », 3,7 GHz crête | 8 Go DDR5 ECC | 256 Go NVMe | AT / DE / NL sans préférence | **12,89 € TTC** en 12 mois, **≈ 15,50 € TTC** sans engagement |
 | **RedHeberg** | **Game ULTRA** | 4 partagés | Ryzen 9 5950X, 4,9 GHz | 8 Go | 70 Go NVMe | **Paris** | **12,95 € TTC** |
 | PulseHeberg | PERF-4 | 2 | Ryzen 9 9900X, 4,4 GHz | 4 Go DDR5 ECC | 60 Go NVMe | Paris | 10 € TTC |
 | PulseHeberg | **CLASSIC-8** | 8 | Xeon Platinum 8260 — **mesuré 2 394 MHz** | 8 Go DDR4 ECC | 120 Go NVMe RAID 10 | France / Suisse | 11 € TTC |
@@ -282,8 +282,8 @@ le CPU est noté E par VPSBenchmarks — même travers que le CLASSIC-8. Écart�
 > une offre CLASSIC serait un mauvais arbitrage : c'est le CPU qu'on ne peut pas corriger
 > après coup sans migrer toute la machine.
 
-**Si l'attente est acceptable — PulseHeberg PERF-8, Paris : 18 €/mois TTC**
-**Commandable aujourd'hui — netcup RS 1000 G12, Amsterdam : ≈ 12,89 €/mois TTC**
+**Retenu — netcup RS 1000 G12 : 12,89 €/mois TTC en 12 mois, ≈ 15,50 € sans engagement**
+**Alternative — UniHeberg GAME-08, Paris : 15,19 € en 12 mois, 17,99 € sans engagement**
 
 Raisonnement :
 
@@ -297,9 +297,11 @@ Raisonnement :
 
 Le RS 1000 G12 est commandable immédiatement et mesure **1 600 – 1 650** en Geekbench 6
 mono-cœur sur ce plan précis, contre 929 pour les offres Classic — soit 1,75× sur le critère
-déterminant, pour 4 € de moins que le PERF-8. Ses cœurs sont **dédiés**, ce qui supprime la
-loterie du vCPU partagé. Concession : Amsterdam plutôt que Paris, sans conséquence réelle
-puisque le crossplay fait de toute façon transiter le trafic par le relais PlayFab.
+déterminant. Ses cœurs sont **dédiés** et sa RAM **ECC**, ce qui supprime à la fois la loterie
+du vCPU partagé et le risque de corruption silencieuse du monde. Concession : Nuremberg ou
+Vienne plutôt que Paris, sans conséquence réelle puisque le crossplay fait de toute façon
+transiter le trafic par le relais PlayFab. Le détail de l'arbitrage face à UniHeberg figure
+plus bas.
 
 Alternatives défendables :
 
@@ -320,6 +322,66 @@ fluidité en jeu identique — cf. le piège du benchmark ci-dessus. Elles ferai
 serveur pour 2 à 5 joueurs, mais avec des à-coups perceptibles à l'exploration, qui
 s'aggraveront à mesure que le monde grossira. C'est le seul paramètre qu'on ne peut pas
 corriger sans changer de machine.
+
+### Arbitrage final : UniHeberg GAME-08 contre netcup RS 1000 G12
+
+**Correction de tarif.** Le chiffre de 12,89 € annoncé plus haut correspond au **tarif à
+12 mois**. Relevé sur la fiche produit officielle netcup :
+
+| | Prix affiché (TTC 19 % allemande) | Équivalent TTC France (20 %) |
+|---|---|---|
+| Engagement 12 mois | 12,79 € | **≈ 12,89 €** |
+| Sans engagement (1 mois) | 15,38 € | **≈ 15,50 €** |
+
+Autres points confirmés sur la fiche : **frais d'installation à 0 €**, trafic illimité (bridé à
+300 Mbit/s au-delà de 3 To par 24 h), interface 2,5 Gbit/s, IPv4 + IPv6 inclus, snapshots
+Copy-On-Write. La localisation de base est « sans préférence Europe » — Autriche, Allemagne ou
+Pays-Bas ; **fixer une localisation précise coûte +1,94 €/mois**, et Amsterdam n'est pas
+sélectionnable individuellement. L'affirmation antérieure sur le choix d'Amsterdam était donc
+inexacte : en pratique, ce sera Nuremberg ou Vienne, soit 25 à 30 ms depuis la France.
+
+L'écart réel entre les deux offres est donc bien plus faible qu'il n'y paraissait :
+
+| | netcup RS 1000 G12 | UniHeberg GAME-08 |
+|---|---|---|
+| 12 mois | 12,89 € | 15,19 € |
+| Sans engagement | ≈ 15,50 € | 17,99 € |
+| **Écart** | — | **+2,30 à 2,49 €/mois** |
+
+Soit une trentaine d'euros par an, et non la soixantaine que laissait croire la comparaison
+d'un tarif engagé avec un tarif non engagé.
+
+**Départage sur les critères, à écart de prix devenu marginal :**
+
+| Critère | netcup | UniHeberg |
+|---|---|---|
+| Cœurs | **4 dédiés** | 6 partagés |
+| CPU | EPYC 9645, 3,7 GHz — **1 600–1 650 GB6 mesuré** | 7950X3D, 5,7 GHz — plus rapide mais non mesuré en VPS |
+| RAM | 8 Go DDR5 **ECC** | 8 Go DDR5, ECC non annoncé |
+| Disque | 256 Go | 75 Go |
+| Localisation | AT / DE / NL, 25–30 ms | **Paris, ~5 ms** |
+| Support | allemand / anglais | **français, Discord** |
+| Prix | **le moins cher** | +2,30 €/mois |
+
+**Retenu : netcup RS 1000 G12.**
+
+Les deux offres franchissent largement le seuil de performance requis pour 2 à 5 joueurs sur un
+monde neuf vanilla. À partir de là, ce n'est plus la vitesse de pointe qui départage mais la
+régularité, et deux éléments tranchent :
+
+1. **Les cœurs dédiés.** Un cœur garanti à 3,7 GHz vaut mieux qu'un cœur à 5,7 GHz partagé avec
+   des voisins inconnus. Les avis UniHeberg mentionnent des ralentissements en heures de pointe
+   — c'est-à-dire précisément le samedi soir, quand le groupe joue.
+2. **La RAM ECC**, sur une machine qui tourne en continu et détient la seule copie chaude du
+   monde entre deux sauvegardes.
+
+Le surcroît de puissance du 7950X3D ne se traduirait par un gain visible que sur un serveur
+moddé, à 10 joueurs, ou sur un monde ancien très construit — aucun des trois cas ici. La
+latence Paris contre Nuremberg est neutralisée par le relais PlayFab du crossplay. Les
+sauvegardes quotidiennes incluses chez UniHeberg font doublon avec la Phase 3.
+
+UniHeberg redeviendrait le bon choix en cas de passage aux mods, à 10 joueurs, ou si le support
+en français devenait déterminant.
 
 ### Méthode retenue : mesurer plutôt que d'arbitrer sur le papier
 
