@@ -64,6 +64,70 @@ Valeurs par défaut utiles : `-saveinterval 1800`, `-backups 4`, `-backupshort 7
 
 ---
 
+## 1 bis. Dimensionnement CPU et RAM
+
+### Spécifications officielles Iron Gate
+
+Pour le serveur dédié : **4 cœurs, 2 Go de RAM, 2 Go de stockage**.
+
+Ce chiffre est notoirement sous-évalué. Dans les faits, même un petit monde avec peu de
+joueurs consomme déjà **environ 3 Go**. Les 2 Go officiels correspondent à un serveur qui
+démarre, pas à un serveur qui tient dans la durée.
+
+### Minimum et recommandé en pratique
+
+| | Minimum praticable | Recommandé |
+|---|---|---|
+| Cœurs CPU | 2 | 4 — au-delà, aucun gain |
+| **Fréquence CPU** | **2,6 GHz** | **3,2 à 3,5 GHz et plus** |
+| RAM | 4 Go | 8 Go |
+| Disque | 2 Go pour l'installation | 35 à 60 Go SSD/NVMe, monde et backups compris |
+| Upload | négligeable à 5 joueurs | ~250 Mbit/s pour 10 joueurs |
+
+**Le seuil des 3,0 GHz est le chiffre à retenir.** En dessous, apparition de rubber-banding à
+l'exploration : la génération de terrain à la volée est mono-thread et ne suit plus. Un cœur à
+3,5 GHz bat une puce serveur à 2,4 GHz quel que soit son nombre de cœurs. C'est exactement le
+critère qui disqualifie les offres CLASSIC de PulseHeberg et le VPS-2 d'OVH.
+
+### RAM selon le scénario
+
+| Scénario | RAM |
+|---|---|
+| Monde neuf, 2 à 4 joueurs | 3 à 4 Go réellement consommés |
+| Vanilla, jusqu'à 10 joueurs | 4 à 6 Go |
+| Monde vieux de quelques mois, 5 à 10 joueurs | 6 à 8 Go |
+| Monde ancien, très exploré et terraformé, gros groupe | 10 Go et plus |
+| Mods légers (BepInEx + QoL) | 8 Go |
+| Gros modpacks, 10+ joueurs moddés | 12 à 16 Go |
+
+Surcoût par type de mod, à titre indicatif : QoL +100 à 300 Mo, construction +200 à 500 Mo,
+contenu et créatures +500 Mo à 1 Go, refonte de la génération de monde +1 à 2 Go.
+
+### Deux points que le handoff ne mentionnait pas
+
+1. **Le crossplay coûte 1 à 2 Go de RAM supplémentaires** par rapport à un serveur Steam seul.
+   Le backend PlayFab n'est pas gratuit en mémoire. Cela concerne directement ce projet.
+2. **Les guides de dimensionnement sont majoritairement publiés par des hébergeurs**, qui
+   vendent de la RAM. Les écarts entre sources vont du simple au double pour un même scénario
+   (4 Go contre 6 Go pour 2 à 5 joueurs vanilla). Les chiffres ci-dessus retiennent la
+   fourchette basse pour la consommation constatée, la fourchette haute pour l'allocation
+   conseillée.
+
+### Conclusion pour ce projet
+
+2 à 5 joueurs, monde neuf, crossplay, sans mods :
+
+- Consommation au démarrage : 3 à 4 Go, plus 1 à 2 Go de crossplay, soit **4 à 6 Go**.
+- Croissance du monde sur six à douze mois : **+2 Go environ**.
+- **Cible : 8 Go de RAM.** Une offre à 4 Go démarrerait correctement mais serait à l'étroit
+  avant la fin de l'année, sans possibilité de corriger autrement qu'en migrant.
+- CPU : au moins 3,0 GHz soutenus, 3,5 GHz et plus de préférence. Quatre cœurs suffisent.
+
+C'est ce qui écarte définitivement les paliers à 4 Go du comparatif (CLASSIC-4, PERF-4,
+GAME-04) au profit des paliers à 8 Go.
+
+---
+
 ## 2. Comparatif VPS
 
 ### Ce que font les hébergeurs de jeu spécialisés, et pourquoi c'est instructif
@@ -315,3 +379,5 @@ et ne contient encore aucune donnée. Sur le serveur définitif, on ne procéder
 - [Ryzen 9 9900X — Geekbench 6 mono-cœur](https://www.techpowerup.com/324235/amd-ryzen-9-9900x-benchmarked-in-geekbench-6-beats-intels-best-in-single-core-score)
 - [CPU de VPS classés par Geekbench 6 mono-cœur — VPSBenchmarks](https://www.vpsbenchmarks.com/labs/cpus_by_geekbench6_perf)
 - [Avis clients RedHeberg — Trustpilot](https://www.trustpilot.com/review/redheberg.fr)
+- [Valheim Dedicated Server Requirements 2026 — CPU, RAM, joueurs](https://dedicatedgameservers.net/articles/valheim-dedicated-server-requirements-2026/)
+- [Valheim Server RAM Guide — vanilla, moddé, crossplay](https://winternode.com/blog/valheim/valheim-server-ram-guide)
