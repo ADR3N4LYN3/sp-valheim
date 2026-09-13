@@ -66,6 +66,56 @@ Valeurs par défaut utiles : `-saveinterval 1800`, `-backups 4`, `-backupshort 7
 
 ## 2. Comparatif VPS
 
+### Ce que font les hébergeurs de jeu spécialisés, et pourquoi c'est instructif
+
+Nitrado possède son matériel et déploie du **Ryzen 9 7950X** grand public et de l'**EPYC 9474F**.
+Ce dernier appartient à la gamme « F » d'AMD, celle des fréquences élevées : 48 cœurs à
+**3,6 GHz de base, 4,1 GHz en crête, 3,95 GHz tous cœurs actifs** — à comparer aux 2,3 GHz de
+base de l'EPYC 9645 que l'on trouve chez les hébergeurs généralistes.
+
+C'est là tout le sujet. AMD et Intel vendent deux familles de processeurs serveur : beaucoup de
+cœurs lents, ou peu de cœurs rapides. Un hébergeur généraliste achète la première, parce que son
+métier est d'empiler des serveurs web et des bases de données qui parallélisent bien. Un
+hébergeur de jeu achète la seconde, parce que son métier est d'exécuter des boucles de
+simulation mono-thread. L'écart de 929 à plus de 3 000 en Geekbench mono-cœur ne vient pas
+d'une optimisation mystérieuse : il vient de cet arbitrage à l'achat.
+
+Modèle commercial : facturation au slot ou à la RAM, plusieurs instances de jeu par machine,
+panel web sans accès root. Chez Nitrado, un Valheim 10 slots sur 30 jours revient à environ
+**13,09 €** sur la boutique européenne, et seul ValheimPlus est proposé en installation
+automatique — pas BepInEx complet. VeryGames, historique français fondé en 2004, fonctionne sur
+le même principe, à partir de 5,99 €/mois.
+
+**Pourquoi cette voie est écartée ici** : sans accès root, il n'y a ni sauvegardes `restic` vers
+un stockage qu'on possède, ni unit systemd, ni panel sur mesure, ni reproductibilité. Autrement
+dit, les phases 2 à 5 de ce projet disparaissent — on loue le panel de l'hébergeur et sa
+politique de sauvegarde. C'est une option parfaitement valable pour qui veut juste jouer sans
+jamais ouvrir un terminal, mais ce n'est pas le cahier des charges.
+
+En revanche, la leçon est directement exploitable : il faut acheter chez un hébergeur qui a fait
+le même arbitrage CPU que Nitrado, **tout en fournissant un accès root**. C'est exactement ce
+que proposent les « VPS Game » français.
+
+### Les VPS Game français : le matériel de Nitrado, avec root
+
+| Hébergeur | Offre | CPU | vCPU / RAM / disque | Prix TTC |
+|---|---|---|---|---|
+| **UniHeberg** | **GAME-08** | **Ryzen 9 7950X3D, 5,7 GHz, 96 Mo de V-Cache 3D** | 6 / 8 Go DDR5 / 75 Go NVMe Gen4-5 | **17,99 €** (15,19 € en 12 mois) |
+| UniHeberg | GAME-04 | idem | 3 / 4 Go DDR5 / 50 Go | 9,99 € (8,19 € en 12 mois) |
+| RedHeberg | Game ULTRA | Ryzen 9 5950X, 4,9 GHz | 4 / 8 Go / 70 Go | 12,95 € |
+
+UniHeberg annonce anti-DDoS L2/L3/L7, SLA 99,9 %, trafic illimité, **sauvegardes externes
+quotidiennes incluses**, et surtout **24 h d'essai gratuit sans carte bancaire**. Avis Trustpilot
+à 4,8/5 sur plus de mille commandes, support Discord réactif ; quelques retours mentionnent
+toutefois des ralentissements en heures de pointe — ce que l'essai gratuit permet précisément
+de vérifier soi-même.
+
+Le V-Cache 3D de 96 Mo est un atout réel et non marketing sur ce cas d'usage : une boucle de
+simulation qui retravaille sans cesse le même jeu de données tient dans ce cache.
+
+Même niche, non détaillés ici : OneHeberge, Athena-Heberg, OuiHeberg, sur du 7950X ou 7950X3D
+équivalent.
+
 ### Exclusions immédiates
 
 | Écarté | Motif |
@@ -207,10 +257,39 @@ serveur pour 2 à 5 joueurs, mais avec des à-coups perceptibles à l'exploratio
 s'aggraveront à mesure que le monde grossira. C'est le seul paramètre qu'on ne peut pas
 corriger sans changer de machine.
 
+### Méthode retenue : mesurer plutôt que d'arbitrer sur le papier
+
+UniHeberg offre **24 h d'essai sans carte bancaire**. Plutôt que de départager le 7950X3D et
+l'EPYC dédié de netcup sur des estimations, la démarche est de mesurer la machine réelle avant
+de payer quoi que ce soit.
+
+Sur le VPS d'essai :
+
+```sh
+curl -sL yabs.sh | bash
+```
+
+C'est la suite utilisée par VPSBenchmarks elle-même (Geekbench 6, fio, iperf3), donc le score
+mono-cœur obtenu est **directement comparable** aux relevés du tableau ci-dessus : 929 pour les
+offres Classic de PulseHeberg, 1 600–1 650 pour le netcup RS 1000 G12.
+
+Grille de décision :
+
+| Résultat GB6 mono-cœur | Conclusion |
+|---|---|
+| > 2 500 | Prendre UniHeberg GAME-08. C'est le meilleur du comparatif, sur sol français. |
+| 1 700 – 2 500 | Acceptable, mais netcup à 12,89 € offre presque autant pour 5 € de moins, avec des cœurs dédiés. |
+| < 1 700 | Hôte saturé, le cas signalé par certains avis. Basculer sur netcup. |
+
+Le tuyautage de `curl` vers `bash` est acceptable ici parce que la machine d'essai est jetable
+et ne contient encore aucune donnée. Sur le serveur définitif, on ne procédera jamais ainsi.
+
 ### À vérifier au moment de la commande
 
 - Possibilité de redimensionner un VPS PulseHeberg en place, sans réinstallation.
 - Frais d'installation éventuels sur un engagement mensuel.
+- Chez UniHeberg, ce que recouvrent exactement les « sauvegardes externes quotidiennes »
+  incluses — elles ne dispensent pas de la Phase 3, mais peuvent la compléter.
 
 ---
 
