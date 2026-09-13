@@ -83,6 +83,7 @@ Valeurs par défaut utiles : `-saveinterval 1800`, `-backups 4`, `-backupshort 7
 | **RedHeberg** | **Game ULTRA** | 4 partagés | Ryzen 9 5950X, 4,9 GHz | 8 Go | 70 Go NVMe | **Paris** | **12,95 € TTC** |
 | PulseHeberg | PERF-4 | 2 | Ryzen 9 9900X, 4,4 GHz | 4 Go DDR5 ECC | 60 Go NVMe | Paris | 10 € TTC |
 | PulseHeberg | **CLASSIC-8** | 8 | Xeon Platinum 8260 — **mesuré 2 394 MHz** | 8 Go DDR4 ECC | 120 Go NVMe RAID 10 | France / Suisse | 11 € TTC |
+| PulseHeberg | **CLASSIC-4** | 4 | Xeon Platinum 8260 — même CPU, même fréquence | 4 Go DDR4 ECC | 80 Go NVMe RAID 10 | France / Suisse | 7 € TTC |
 | OVHcloud | VPS-2 2027 | 4 | Intel ≈ 2,4 GHz. VPSBenchmarks : *Raw CPU Power* **E — 6,5/20** | 8 Go | 75 Go NVMe | Gravelines / Roubaix / Strasbourg | 7,21 € HT / **8,65 € TTC** |
 | netcup | VPS 1000 G12 | 4 partagés | EPYC 9645 | 8 Go DDR5 ECC | 256 Go NVMe | idem netcup | 8,71 € HT ≈ 10,45 € TTC |
 | RedHeberg | Game PRO | 2 partagés | Ryzen 9 5950X, 4,9 GHz | 6 Go | 50 Go NVMe | Paris | 8,95 € TTC |
@@ -98,7 +99,44 @@ Le chiffre du nom correspond à la **RAM en Go**, pas au nombre de vCore.
 | PERF-8 | 4 | 8 Go | 100 Go | 1 Gb/s | 18 € |
 | PERF-16 | 8 | 16 Go | 150 Go | 1 Gb/s | 27 € |
 
-### Pourquoi CLASSIC-8 est écarté malgré ses 8 vCore et ses 11 €
+### Le piège du benchmark affiché sur la page de commande
+
+PulseHeberg affiche un score **Geekbench 4** sur chaque offre Classic :
+
+| Offre | Prix | vCPU | Score affiché | Score **par cœur** |
+|---|---|---|---|---|
+| CLASSIC-4 | 7 € | 4 | 13 802 | 3 450 |
+| CLASSIC-8 | 11 € | 8 | 25 869 | 3 234 |
+
+Le score double exactement quand le nombre de cœurs double : c'est un score **multi-cœur**,
+qui ne mesure que la quantité de cœurs. Rapporté au cœur, les deux offres sont identiques —
+même Xeon 8260, même 2,40 GHz.
+
+Comme Valheim n'exploite sérieusement qu'un seul cœur, **CLASSIC-4 et CLASSIC-8 offrent
+exactement la même fluidité en jeu**. Les 4 € d'écart achètent de la RAM et du disque, pas
+des performances. Le chiffre mis en avant sur la page de commande est donc précisément la
+mauvaise métrique pour cet usage.
+
+À noter également : Geekbench 4 est un benchmark de 2016, abandonné depuis. La référence
+actuelle est Geekbench 6, dont les scores ne sont pas comparables.
+
+### Comparaison à la bonne métrique : Geekbench 6 mono-cœur, mesuré sur VPS réels
+
+Relevés VPSBenchmarks, sur les offres elles-mêmes quand elles y figurent :
+
+| Offre | CPU | **GB6 mono-cœur** |
+|---|---|---|
+| PulseHeberg CLASSIC-4 / CLASSIC-8 | Xeon Platinum 8260 | **929** (relevé sur un Classic-8) |
+| netcup RS 1000 G12 | EPYC 9645 | **1 600 – 1 650** (relevé sur ce plan précis) |
+| RedHeberg — équivalents Ryzen 9 5950X | Ryzen 9 5950X | 2 050 – 2 150 sur hôte correct, mais **600 – 650** sur un hôte surchargé |
+| PulseHeberg PERF — Ryzen 9 9900X | Ryzen 9 9900X | non mesuré en VPS ; 3 401 en bare metal, et un 9950X relevé entre 2 700 et 3 350 en VPS |
+
+Deux enseignements : l'EPYC dédié de netcup vaut environ **1,75×** le Xeon des offres Classic,
+et l'écart de 600 à 2 150 constaté sur des VPS Ryzen 5950X montre le risque propre au vCPU
+partagé — la performance dépend du taux de remplissage de l'hôte, ce que le cœur dédié de
+netcup élimine par construction.
+
+### Pourquoi les offres CLASSIC sont écartées
 
 Mesures relevées sur un Classic-8 réel (VPSBenchmarks, Paris, 30 août 2026) :
 
@@ -125,8 +163,13 @@ le CPU est noté E par VPSBenchmarks — même travers que le CLASSIC-8. Écart�
 
 ## 3. Recommandation
 
-**Principale — PulseHeberg PERF-8, Paris : 18 €/mois TTC**
-**Alternative — netcup RS 1000 G12, Amsterdam : ≈ 12,89 €/mois TTC**
+> **Situation au 13/09/2026 : la gamme Performance Cloud est en rupture de stock.**
+> Le choix se joue donc entre attendre le réassort et commander ailleurs. Se rabattre sur
+> une offre CLASSIC serait un mauvais arbitrage : c'est le CPU qu'on ne peut pas corriger
+> après coup sans migrer toute la machine.
+
+**Si l'attente est acceptable — PulseHeberg PERF-8, Paris : 18 €/mois TTC**
+**Commandable aujourd'hui — netcup RS 1000 G12, Amsterdam : ≈ 12,89 €/mois TTC**
 
 Raisonnement :
 
@@ -138,20 +181,31 @@ Raisonnement :
 5. 18 € reste dans le budget de 20 €, chez un hébergeur où le compte existe déjà — pas de
    fournisseur supplémentaire à gérer pour 5 € d'écart sur un serveur prévu pour durer.
 
+Le RS 1000 G12 est commandable immédiatement et mesure **1 600 – 1 650** en Geekbench 6
+mono-cœur sur ce plan précis, contre 929 pour les offres Classic — soit 1,75× sur le critère
+déterminant, pour 4 € de moins que le PERF-8. Ses cœurs sont **dédiés**, ce qui supprime la
+loterie du vCPU partagé. Concession : Amsterdam plutôt que Paris, sans conséquence réelle
+puisque le crossplay fait de toute façon transiter le trafic par le relais PlayFab.
+
 Alternatives défendables :
 
-- **PulseHeberg PERF-4 à 10 €** — même CPU rapide, mais 2 vCore et 4 Go. Tient pour 2 à 5
-  joueurs sur un monde neuf, sera à l'étroit d'ici un an. À ne retenir que si le
+- **PulseHeberg PERF-4 à 10 €** (si réassort) — même CPU rapide, mais 2 vCore et 4 Go. Tient
+  pour 2 à 5 joueurs sur un monde neuf, sera à l'étroit d'ici un an. À ne retenir que si le
   redimensionnement en place est possible sans réinstallation.
-- **netcup RS 1000 G12 à 12,89 €** — meilleur rapport quantité/prix du comparatif (4 cœurs
-  **dédiés**, 256 Go NVMe, 5 € de moins), mais Amsterdam, un compte de plus, et un cœur EPYC
-  à 3,7 GHz reste en retrait d'un 9900X à 4,4 GHz. Le crossplay faisant transiter le trafic
-  par le relais PlayFab, l'écart de latence Paris/Amsterdam est en revanche négligeable.
+- **RedHeberg Game ULTRA à 12,95 €** — Paris, Ryzen 9 5950X, 8 Go. Le CPU est excellent quand
+  l'hôte n'est pas saturé, mais les relevés VPS sur ce processeur vont de 600 à 2 150 selon
+  l'hébergeur, et les avis Trustpilot de RedHeberg font état de problèmes de réactivité du
+  support, de litiges de remboursement et de pertes de données sur serveurs dédiés. À ne
+  retenir que si le sol français prime sur tout le reste.
 
 ### À écarter explicitement
 
-**PulseHeberg CLASSIC-8 (11 €)** : 8 vCore Xeon Platinum 8260 mesurés à 2 394 MHz,
-Geekbench 6 mono-cœur à 929. Moins cher que le PERF-8 mais inadapté — cf. section précédente.
+**PulseHeberg CLASSIC-4 (7 €) et CLASSIC-8 (11 €)** : même Xeon Platinum 8260 mesuré à
+2 394 MHz, Geekbench 6 mono-cœur à 929 dans les deux cas. Les deux offres délivrent une
+fluidité en jeu identique — cf. le piège du benchmark ci-dessus. Elles feraient tourner un
+serveur pour 2 à 5 joueurs, mais avec des à-coups perceptibles à l'exploration, qui
+s'aggraveront à mesure que le monde grossira. C'est le seul paramètre qu'on ne peut pas
+corriger sans changer de machine.
 
 ### À vérifier au moment de la commande
 
@@ -180,3 +234,5 @@ Geekbench 6 mono-cœur à 929. Moins cher que le PERF-8 mais inadapté — cf. s
 - [PulseHeberg Classic-8 — relevé YABS](https://www.vpsbenchmarks.com/yabs/pulseheberg-8c-8gb-20260830-1d05c4)
 - [Intel Xeon Platinum 8260 — PassMark](https://www.cpubenchmark.net/cpu.php?cpu=Intel+Xeon+Platinum+8260+%40+2.40GHz&id=3561)
 - [Ryzen 9 9900X — Geekbench 6 mono-cœur](https://www.techpowerup.com/324235/amd-ryzen-9-9900x-benchmarked-in-geekbench-6-beats-intels-best-in-single-core-score)
+- [CPU de VPS classés par Geekbench 6 mono-cœur — VPSBenchmarks](https://www.vpsbenchmarks.com/labs/cpus_by_geekbench6_perf)
+- [Avis clients RedHeberg — Trustpilot](https://www.trustpilot.com/review/redheberg.fr)
