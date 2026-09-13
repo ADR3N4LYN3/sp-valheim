@@ -28,7 +28,7 @@
 | Ports UDP | 2456, 2457, **2458** | Doc officielle : « the specified Port AND specified Port+1 », soit **2456–2457/UDP**. Le 2458 n'apparaît nulle part dans la documentation Iron Gate | **Corrigé** |
 | Dépendances Linux | `libatomic1`, `libpulse0`, `libpulse-dev` | Confirmées. Ajouter `libc6` pour le backend crossplay. GLIBC ≥ 2.29, GLIBCXX ≥ 3.4.26 | Confirmé |
 | Architecture | x86_64 uniquement | **Toujours x86_64 uniquement en 2026.** Aucun binaire ARM64 officiel ; les solutions ARM existantes reposent sur l'émulation box64 ou FEX | Confirmé |
-| Chemin des sauvegardes | `~/.config/unity3d/IronGate/Valheim/worlds_local` | Confirmé. Les fichiers de permissions sont dans le dossier parent `~/.config/unity3d/IronGate/Valheim/` | Confirmé |
+| Chemin des sauvegardes | `~/.config/unity3d/IronGate/Valheim/worlds_local`, fichiers `.db` + `.fwl` | Chemin confirmé. **Mais le format a changé en 1.0** : le couple `.db`/`.fwl` est remplacé par **un dossier par monde**. Détail ci-dessous | **Corrigé** |
 | Contraintes mot de passe | à vérifier | **≥ 5 caractères**, et ne doit **pas être contenu** dans le nom du serveur, le nom du monde ou la seed (comparaison **insensible à la casse**). Sinon le serveur logue `Error bad password:` et s'arrête immédiatement | Précisé |
 | `adminlist.txt` / `bannedlist.txt` / `permittedlist.txt` | emplacement et syntaxe | Dans `~/.config/unity3d/IronGate/Valheim/`. Un identifiant par ligne, format `[Plateforme]_[UserID]`, **sensible à la casse** | Précisé |
 | Joueurs simultanés | — | 1 à 10, **inchangé en 1.0** | Confirmé |
@@ -49,7 +49,35 @@ Valeurs par défaut utiles : `-saveinterval 1800`, `-backups 4`, `-backupshort 7
   sinon erreur *Incompatible Version*. Un serveur non mis à jour est hors service pour tout le monde.
 - Les mondes existants sont conservés ; le nouveau terrain n'apparaît que là où personne n'est passé.
 
-### Crossplay — quatre conséquences concrètes
+### Format des sauvegardes en 1.0 — changement majeur
+
+Le couple `.db` + `.fwl` décrit dans le handoff **n'est plus le format courant**. Depuis la 1.0,
+chaque monde est **un dossier** :
+
+```
+.config/unity3d/IronGate/Valheim/worlds_local/<NomDuMonde>/
+├── _main.N.fwl2      métadonnées (remplace le .fwl)
+├── _main.N.db2       données du monde (remplace le .db)
+├── _main.N.chunks    index des chunks
+├── _main.N.ok        marqueur de fin d'écriture
+└── 00_00__0_1.chunk  terrain, réparti sur de nombreux fichiers
+```
+
+`N` est un compteur de génération incrémenté à chaque sauvegarde ; **plusieurs générations
+coexistent** dans le dossier.
+
+Trois conséquences opérationnelles :
+
+1. **Une sauvegarde, c'est le dossier entier.** Une copie partielle ne se chargera pas : le
+   serveur générera un monde neuf par-dessus le nom. C'est le piège classique.
+2. La coexistence de plusieurs générations est une protection utile : même si la copie attrape
+   la génération la plus récente en cours d'écriture, les générations antérieures complètes
+   sont dans le même dossier.
+3. Les mondes antérieurs à la 1.0 restent pris en charge. Ils sont convertis au premier
+   chargement sous 1.0, après sauvegarde automatique du couple d'origine, qui n'est pas
+   supprimé. La conversion est à sens unique — sauvegarder avant ce premier chargement.
+
+### Crossplay — cinq conséquences concrètes
 
 1. `-crossplay` bascule le serveur du backend **Steam** vers le backend **PlayFab**. C'est
    obligatoire pour que PS5, Switch 2 et Xbox puissent rejoindre.
@@ -61,6 +89,10 @@ Valeurs par défaut utiles : `-saveinterval 1800`, `-backups 4`, `-backupshort 7
    Sans ça, chaque redémarrage rend le serveur introuvable pour les joueurs console.
 4. Trois modes de connexion coexistent en crossplay : IP publique + port, code de partie, ou liste
    de serveurs.
+5. **Le crossplay et les mods BepInEx sont mutuellement exclusifs.** Un serveur en crossplay ne
+   peut pas charger de mods, les clients console n'ayant aucun moyen de les installer. Tant que
+   le crossplay est actif, le serveur reste en vanilla — quel que soit l'hébergeur. Cela retire
+   l'argument « je pourrai modder plus tard » du débat auto-hébergement contre hébergement géré.
 
 ---
 
@@ -443,3 +475,6 @@ et ne contient encore aucune donnée. Sur le serveur définitif, on ne procéder
 - [Avis clients RedHeberg — Trustpilot](https://www.trustpilot.com/review/redheberg.fr)
 - [Valheim Dedicated Server Requirements 2026 — CPU, RAM, joueurs](https://dedicatedgameservers.net/articles/valheim-dedicated-server-requirements-2026/)
 - [Valheim Server RAM Guide — vanilla, moddé, crossplay](https://winternode.com/blog/valheim/valheim-server-ram-guide)
+- [Valheim Save Location et le format dossier de la 1.0](https://www.gameserverkings.com/knowledge-base/valheim/valheim-save-location/)
+- [Nitrado — étude de cas AMD, EPYC 9474F et Ryzen 9 7950X](https://www.amd.com/en/resources/case-studies/nitrado.html)
+- [VeryCloud / VeryGames — infrastructure Telehouse 3, Ryzen 9](https://verycloud.fr/games/rust)

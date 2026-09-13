@@ -1,9 +1,19 @@
 # sp-valheim
 
-Serveur Valheim dédié privé sur VPS, avec panel d'administration accessible au seul propriétaire.
+Serveur Valheim privé pour un groupe de 2 à 5 joueurs, en crossplay console.
 
-Ce dépôt est la **source de vérité** de l'infrastructure : chaque fichier de configuration présent
-sur le VPS existe aussi ici. Si la machine disparaît, tout doit se rejouer depuis ce dépôt.
+## État : hébergement géré retenu, projet VPS écarté
+
+Après la Phase 0, le projet d'auto-hébergement décrit dans le handoff a été **abandonné au
+profit d'un hébergement géré chez Nitrado** (13,09 € / 30 jours).
+
+Trois raisons : le coût est identique, le crossplay interdit les mods de toute façon — ce qui
+retire le principal intérêt du contrôle total — et le panel Nitrado couvre déjà les besoins
+fonctionnels du cahier des charges. Le raisonnement complet est dans
+[`docs/03-decision.md`](docs/03-decision.md).
+
+Le seul point qui demande un effort réel est conservé : **garder une copie des sauvegardes chez
+soi**, les sauvegardes Nitrado vivant chez Nitrado.
 
 ## Cahier des charges
 
@@ -13,28 +23,28 @@ sur le VPS existe aussi ici. Si la machine disparaît, tout doit se rejouer depu
 | Monde | Neuf |
 | Joueurs | France / Benelux |
 | Crossplay console | Oui (PS5 / Switch 2 / Xbox) |
-| Mods | Non |
-| Budget VPS | ≤ 20 €/mois |
-
-## Avancement
-
-| Phase | État |
-|---|---|
-| 0 — Recherche et recommandation VPS | Terminée — [`docs/01-phase-0-recherche.md`](docs/01-phase-0-recherche.md) |
-| 1 — Provisionnement et durcissement | En attente de validation du VPS |
-| 2 — Serveur de jeu | À faire |
-| 3 — Sauvegardes externes | À faire |
-| 4 — Panel d'administration | À faire |
-| 5 — Exploitation et runbook | À faire |
+| Mods | Non — impossible en crossplay de toute façon |
+| Budget | ≤ 20 €/mois |
 
 ## Documents
 
-- [`docs/00-handoff.md`](docs/00-handoff.md) — cahier des charges d'origine, tel que reçu
-- [`docs/01-phase-0-recherche.md`](docs/01-phase-0-recherche.md) — valeurs techniques revérifiées,
-  comparatif VPS chiffré, recommandation
+| Fichier | Contenu |
+|---|---|
+| [`docs/02-runbook-nitrado.md`](docs/02-runbook-nitrado.md) | **À utiliser au quotidien.** Commande, configuration, connexion, sauvegardes, mises à jour |
+| [`docs/03-decision.md`](docs/03-decision.md) | Pourquoi Nitrado plutôt que le VPS, et dans quels cas rouvrir le dossier |
+| [`docs/01-phase-0-recherche.md`](docs/01-phase-0-recherche.md) | Recherche technique Valheim 1.0 et comparatif VPS chiffré. Reste valable si le sujet du VPS revenait |
+| [`docs/00-handoff.md`](docs/00-handoff.md) | Cahier des charges d'origine, tel que reçu |
+
+## Les trois choses à retenir
+
+1. **Le code de partie à 6 chiffres change à chaque redémarrage du serveur.** Faire ajouter le
+   serveur par son nom dans la liste, plutôt que par code.
+2. **Une sauvegarde Valheim 1.0, c'est un dossier entier**, plus un couple de fichiers
+   `.db` / `.fwl`. Une copie partielle ne se charge pas — le serveur génère un monde neuf
+   par-dessus.
+3. **Les sauvegardes Nitrado ne t'appartiennent pas.** Garder une copie chez soi.
 
 ## Règles
 
-- Aucun secret en clair dans ce dépôt. Les mots de passe et clés vivent dans des fichiers `.env`
-  en `600` sur le VPS, jamais versionnés.
-- Chaque phase est validée par un test concret avant de passer à la suivante.
+Aucun secret en clair dans ce dépôt : identifiants FTP, mots de passe serveur et clés restent en
+dehors, dans des fichiers en permissions `600`.
