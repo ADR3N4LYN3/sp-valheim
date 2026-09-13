@@ -1,0 +1,19 @@
+# Secrets — ne doivent jamais être versionnés
+*.env
+!*.env.example
+secrets/
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+restic-password*
+
+# Sauvegardes et mondes
+*.db
+*.fwl
+worlds_local/
+backups/
+
+# Divers
+.DS_Store
+*.log
